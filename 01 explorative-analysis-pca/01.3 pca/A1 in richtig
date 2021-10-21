@@ -1,0 +1,2 @@
+for col in cols:
+  eData[col] = eData[col] - eData[col].mean()
