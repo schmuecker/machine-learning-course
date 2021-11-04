@@ -9,14 +9,22 @@ data_path = join(script_path, 'data/lfw_funneled/')
 
 # Get folders of people with equal or more than 70 images
 people_folders = listdir(data_path)
-people_over_70_images = []
-for f in people_folders:
-    path = join(data_path, f)
+people_over_70_files = []
+for file in people_folders:
+    path = join(data_path, file)
     if (not isfile(path)):
         files = listdir(path)
         if (len(files) >= 70):
-            people_over_70_images.append(path)
+            people_over_70_files.append(path)
 
-for person in people_over_70_images:
-    for file in listdir(person):
-        print(imread(file))
+print(people_over_70_files)
+
+# Get images from files
+people_over_70_images = []
+for person_path in people_over_70_files:
+    for file in listdir(person_path):
+        path = join(person_path, file)
+        image = io.imread(path)
+        people_over_70_images.append(image)
+
+print(people_over_70_images)
