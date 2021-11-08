@@ -1,14 +1,14 @@
 import sys
+import pathlib
+import shutil
 from os import listdir
 from datetime import datetime
-from os.path import isfile, join, dirname, realpath
-from skimage import io
+from os.path import isfile, join, dirname, realpath, basename, exists
+from skimage.io import imread, imsave
 from skimage.util import crop
 from skimage.transform import resize
 import matplotlib.pyplot as plt
 import numpy as np
-
-# Log helper with timestamp
 
 
 def log(*args):
@@ -53,12 +53,14 @@ log('Found', len(people_over_70_files),
 # Get images from files
 images = []
 images_paths = []
+images_filenames = []
 for person_path in people_over_70_files:
     files = listdir(person_path)
     for file in files[:-1]:
         path = join(person_path, file)
-        image = io.imread(path, as_gray=True)
+        image = imread(path, as_gray=True)
         images.append(image)
+        images_filenames.append(file)
         images_paths.append(person_path)
 
 log('Leaving out the last image of each person, we have a total of',
@@ -77,9 +79,33 @@ for image in images:
 log("Created list of peoples' names for", len(images_paths), "images.")
 
 # Evaluate: Plot first 100 pictures
-plt.figure(figsize=(10, 10))
-for idx, image in enumerate(images_processed[:100]):
-    plt.subplot(10, 10, 1 + idx), plt.imshow(image), plt.axis('off')
-plt.show()
+# plt.figure(figsize=(10, 10))
+# for idx, image in enumerate(images_processed[:100]):
+#     plt.subplot(10, 10, 1 + idx), plt.imshow(image), plt.axis('off')
+# plt.show()
+
+
+# Export processed images to disk
+output_folder = join(script_path, 'data-processed/')
+# Delete output folder
+if exists(output_folder):
+    shutil.rmtree(output_folder)
+# Create output folder
+pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)
+
+# Export images
+for idx, image in enumerate(images_processed):
+    # Get file path
+    person_name = basename(images_paths[idx])
+    path = join(output_folder, person_name)
+    filename = images_filenames[idx]
+    # Create person folder
+    pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+    # Save image
+    imsave(join(path, filename), images_processed[idx], quality=100)
+
+log('Exported saved images to', output_folder)
+
+# Todo: process last image of the people separately
 
 log('Done.')
