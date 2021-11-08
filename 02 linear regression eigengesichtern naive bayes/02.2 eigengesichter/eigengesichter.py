@@ -32,6 +32,24 @@ def process_image(image):
     return image_scaled
 
 
+def export_images(output_path: str, images: list, paths: list):
+    # Create output folder if necessary
+    pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
+    # Export images
+    for idx, image in enumerate(images):
+        # Get file path
+        person_name = basename(paths[idx])
+        path = join(output_path, person_name)
+        filename = images_filenames[idx]
+        # Create person folder
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+        # Save image
+        filepath = join(path, filename)
+        imsave(filepath, image, quality=100)
+
+    log('Exported saved images to', output_path)
+
+
 # Get paths
 script_path = dirname(realpath(sys.argv[0]))
 data_path = join(script_path, 'data/lfw_funneled/')
@@ -72,39 +90,15 @@ for image in images:
     i = process_image(image)
     images_processed.append(i)
 
-# Put images_paths in a vertical vector
-# Is this necessary or can we just use images_paths?
-# a = np.asarray(images_paths)
-# images_paths_v = a.reshape(len(a), 1)
-log("Created list of peoples' names for", len(images_paths), "images.")
-
-# Evaluate: Plot first 100 pictures
-# plt.figure(figsize=(10, 10))
-# for idx, image in enumerate(images_processed[:100]):
-#     plt.subplot(10, 10, 1 + idx), plt.imshow(image), plt.axis('off')
-# plt.show()
-
-
 # Export processed images to disk
 output_folder = join(script_path, 'data-processed/')
+
 # Delete output folder
 if exists(output_folder):
     shutil.rmtree(output_folder)
-# Create output folder
-pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)
 
 # Export images
-for idx, image in enumerate(images_processed):
-    # Get file path
-    person_name = basename(images_paths[idx])
-    path = join(output_folder, person_name)
-    filename = images_filenames[idx]
-    # Create person folder
-    pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-    # Save image
-    imsave(join(path, filename), images_processed[idx], quality=100)
-
-log('Exported saved images to', output_folder)
+export_images(output_folder, images_processed, images_paths)
 
 # Todo: process last image of the people separately
 
