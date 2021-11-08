@@ -32,7 +32,7 @@ def process_image(image):
     return image_scaled
 
 
-def export_images(output_path: str, images: list, paths: list):
+def export_images(output_path: str, images: list, paths: list, filenames: list):
     # Create output folder if necessary
     pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
     # Export images
@@ -40,7 +40,7 @@ def export_images(output_path: str, images: list, paths: list):
         # Get file path
         person_name = basename(paths[idx])
         path = join(output_path, person_name)
-        filename = images_filenames[idx]
+        filename = filenames[idx]
         # Create person folder
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)
         # Save image
@@ -67,13 +67,16 @@ for file in people_folders:
 log('Found', len(people_over_70_files),
     'people with ≥70 pictures.')
 
+# ---
+# Images from people with over 70 images (except for the last image)
+# ---
 
 # Get images from files
 images = []
 images_paths = []
 images_filenames = []
 for person_path in people_over_70_files:
-    files = listdir(person_path)
+    files = sorted(listdir(person_path))
     for file in files[:-1]:
         path = join(person_path, file)
         image = imread(path, as_gray=True)
@@ -91,15 +94,49 @@ for image in images:
     images_processed.append(i)
 
 # Export processed images to disk
-output_folder = join(script_path, 'data-processed/')
+output_folder = join(script_path, 'data-processed/training/')
 
 # Delete output folder
 if exists(output_folder):
     shutil.rmtree(output_folder)
 
 # Export images
-export_images(output_folder, images_processed, images_paths)
+export_images(output_folder, images_processed, images_paths, images_filenames)
 
-# Todo: process last image of the people separately
+# ---
+# Last image from people with over 70 images
+# ---
+
+# Get images from files
+images = []
+images_paths = []
+images_filenames = []
+for person_path in people_over_70_files:
+    files = sorted(listdir(person_path))
+    file = files[-1]
+    path = join(person_path, file)
+    image = imread(path, as_gray=True)
+    images.append(image)
+    images_filenames.append(file)
+    images_paths.append(person_path)
+
+log('Only the last image of each person, we have a total of',
+    len(images), 'images.')
+
+# Process images
+images_processed = []
+for image in images:
+    i = process_image(image)
+    images_processed.append(i)
+
+# Export processed images to disk
+output_folder = join(script_path, 'data-processed/test/')
+
+# Delete output folder
+if exists(output_folder):
+    shutil.rmtree(output_folder)
+
+# Export images
+export_images(output_folder, images_processed, images_paths, images_filenames)
 
 log('Done.')
