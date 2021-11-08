@@ -139,4 +139,6 @@ if exists(output_folder):
 # Export images
 export_images(output_folder, images_processed, images_paths, images_filenames)
 
+log(images_processed[0])
+
 log('Done.')
