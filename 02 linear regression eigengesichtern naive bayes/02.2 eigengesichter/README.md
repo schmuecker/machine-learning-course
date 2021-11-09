@@ -5,7 +5,7 @@ This exercise is implemented to run locally on your machine.
 ## Preparation
 
 Make sure you have `pipenv` installed.
-Run `pipenv install` in this directory to download install dependencies.
+Run `pipenv install` in this directory to download and install dependencies.
 
 ## Scripts
 
