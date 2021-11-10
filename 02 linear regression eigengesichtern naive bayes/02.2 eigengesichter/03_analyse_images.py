@@ -13,25 +13,16 @@ import pandas as pd
 import scipy.stats as stats
 
 
-def flatten(t):
-    return [item for sublist in t for item in sublist]
-
-
 def pca(df: pd.DataFrame):
-
     # 1. Zentrierung
     for col in df.columns:
         df[col] = df[col] - df[col].mean()
-
     # 2. Normierung, z-Transformation damit Varianz immer 1 ist
     df = df.apply(stats.zscore)
-
     # 3. DF zu n * d Matrix X umwandeln
     X = df.to_numpy()
-
     # 4.-7. Eigenwertproblem
     U, D, V = np.linalg.svd(X, full_matrices=False)
-
     return U, D, V
 
 
@@ -50,16 +41,25 @@ for person in person_folders:
         image = imread(path)
         images.append(image)
 
-images_flattened = np.ndarray.flatten(images)
-images_flattened_2 = []
-for image in images_flattened:
-    print(np.ndarray.flatten(image))
-    images_flattened_2.append(np.ndarray.flatten(image))
-
-# print(images_flattened[0])
+# Flatten images
+image_pixels = images
+for idx, image in enumerate(images):
+    image_pixels[idx] = []
+    for row in image:
+        for pixel in row:
+            image_pixels[idx].append(pixel)
 
 # Design matrix
-# design_matrix = pd.DataFrame(images_flattened)
+design_matrix = pd.DataFrame(image_pixels)
 
-# pca_result = pca(design_matrix)
-# print(pca_result)
+# PCA
+U, D, V = pca(design_matrix)
+n = U.shape[0]
+
+d = pd.DataFrame(D, columns=["SingularValue"])
+d["EigenValue"] = d["SingularValue"] ** 2
+d["Varianz"] = d["SingularValue"] / (n-1)
+d["AnteilVarianz%"] = d["Varianz"] / (d["Varianz"].sum()) * 100
+d["Kumuliert%"] = d["AnteilVarianz%"].cumsum()
+d["Fehler"] = 100 - d["Kumuliert%"]
+print(d)
