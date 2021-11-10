@@ -42,15 +42,15 @@ for person in person_folders:
         images.append(image)
 
 # Flatten images
-image_pixels = images
+images_pixels = images
 for idx, image in enumerate(images):
-    image_pixels[idx] = []
+    images_pixels[idx] = []
     for row in image:
         for pixel in row:
-            image_pixels[idx].append(pixel)
+            images_pixels[idx].append(pixel)
 
 # Design matrix
-design_matrix = pd.DataFrame(image_pixels)
+design_matrix = pd.DataFrame(images_pixels)
 
 # PCA
 U, D, V = pca(design_matrix)
