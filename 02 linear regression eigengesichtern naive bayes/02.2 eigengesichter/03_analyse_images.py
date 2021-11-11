@@ -10,6 +10,7 @@ from skimage.transform import resize
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn import decomposition
 import scipy.stats as stats
 
 
@@ -26,31 +27,38 @@ def pca(df: pd.DataFrame):
     return U, D, V
 
 
-# Get paths
-script_path = dirname(realpath(sys.argv[0]))
-people_path = join(script_path, 'data-processed/training/')
+def load_images(path: str):
+    script_path = dirname(realpath(sys.argv[0]))
+    abs_path = join(script_path, path)
+
+    # Load images
+    person_folders = listdir(abs_path)
+    images = []
+    for person in person_folders:
+        path = join(abs_path, person)
+        files = listdir(path)
+        for file in files:
+            filePath = join(path, file)
+            image = imread(filePath)
+            images.append(image)
+
+    # Flatten images to pixels
+    images_pixels = images
+    for idx, image in enumerate(images):
+        images_pixels[idx] = []
+        for row in image:
+            for pixel in row:
+                images_pixels[idx].append(pixel)
+
+    return images_pixels
 
 
-person_folders = listdir(people_path)
-images = []
-for person in person_folders:
-    path = join(people_path, person)
-    files = listdir(path)
-    for file in files:
-        filePath = join(path, file)
-        image = imread(filePath)
-        images.append(image)
-
-# Flatten images
-images_pixels = images
-for idx, image in enumerate(images):
-    images_pixels[idx] = []
-    for row in image:
-        for pixel in row:
-            images_pixels[idx].append(pixel)
+# Load pixels from images
+images_pixels_t = load_images('data-processed/training/')
+images_pixels_te = load_images('data-processed/test/')
 
 # Design matrix
-design_matrix = pd.DataFrame(images_pixels)
+design_matrix = pd.DataFrame(images_pixels_t)
 
 # PCA
 U, D, V = pca(design_matrix)
@@ -67,5 +75,28 @@ pca_result["Index"] = pca_result.index
 print(pca_result)
 
 # Plot Eigenvalues
-pca_result.head(150).plot.scatter(x=6, y=1)
+# pca_result.head(150).plot.scatter(x=6, y=1)
+# plt.show()
+
+sk_pca = decomposition.PCA(n_components=150, whiten=True)
+sk_pca.fit(images_pixels_t)
+# plt.imshow(sk_pca.mean_.reshape(32, 32),
+#            cmap=plt.cm.bone)
+# plt.show()
+
+fig = plt.figure(figsize=(16, 6))
+for i in range(12):
+    ax = fig.add_subplot(3, 4, i + 1, xticks=[], yticks=[])
+    ax.imshow(sk_pca.components_[i].reshape(32, 32),
+              cmap=plt.cm.bone)
 plt.show()
+
+# Interpretation:
+# - first 4 pc's are lighting conditions (dark, left, bright, right)
+# - other images show specific features of the faces
+
+# 2d)
+
+# Centralize test data
+# for col in df.columns:
+#     df[col] = df[col] - df[col].mean()

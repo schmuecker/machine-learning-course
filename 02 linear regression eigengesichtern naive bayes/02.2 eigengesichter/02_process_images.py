@@ -20,9 +20,9 @@ def log(*args):
 def process_image(image):
     # Crop
     crop_top = 90
-    crop_bottom = 65
-    crop_left = 75
-    crop_right = 75
+    crop_bottom = 70
+    crop_left = 80
+    crop_right = 80
     image_cropped = crop(image, ((crop_top, crop_bottom),
                                  (crop_left, crop_right)), copy=False)
     # Scale
