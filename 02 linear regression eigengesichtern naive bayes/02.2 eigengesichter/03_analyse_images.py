@@ -28,7 +28,7 @@ def pca(df: pd.DataFrame):
 
 # Get paths
 script_path = dirname(realpath(sys.argv[0]))
-people_path = join(script_path, 'data-processed/test/')
+people_path = join(script_path, 'data-processed/training/')
 
 
 person_folders = listdir(people_path)
@@ -37,8 +37,8 @@ for person in person_folders:
     path = join(people_path, person)
     files = listdir(path)
     for file in files:
-        path = join(path, file)
-        image = imread(path)
+        filePath = join(path, file)
+        image = imread(filePath)
         images.append(image)
 
 # Flatten images
@@ -56,10 +56,16 @@ design_matrix = pd.DataFrame(images_pixels)
 U, D, V = pca(design_matrix)
 n = U.shape[0]
 
-d = pd.DataFrame(D, columns=["SingularValue"])
-d["EigenValue"] = d["SingularValue"] ** 2
-d["Varianz"] = d["SingularValue"] / (n-1)
-d["AnteilVarianz%"] = d["Varianz"] / (d["Varianz"].sum()) * 100
-d["Kumuliert%"] = d["AnteilVarianz%"].cumsum()
-d["Fehler"] = 100 - d["Kumuliert%"]
-print(d)
+pca_result = pd.DataFrame(D, columns=["SingularValue"])
+pca_result["EigenValue"] = pca_result["SingularValue"] ** 2
+pca_result["Varianz"] = pca_result["SingularValue"] / (n-1)
+pca_result["AnteilVarianz%"] = pca_result["Varianz"] / \
+    (pca_result["Varianz"].sum()) * 100
+pca_result["Kumuliert%"] = pca_result["AnteilVarianz%"].cumsum()
+pca_result["Fehler"] = 100 - pca_result["Kumuliert%"]
+pca_result["Index"] = pca_result.index
+print(pca_result)
+
+# Plot Eigenvalues
+pca_result.head(150).plot.scatter(x=6, y=1)
+plt.show()
