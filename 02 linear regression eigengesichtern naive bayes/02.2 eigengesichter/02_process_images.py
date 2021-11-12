@@ -49,6 +49,8 @@ def export_images(output_path: str, images: list, paths: list, filenames: list):
 
     log('Exported saved images to', output_path)
 
+# b)
+
 
 # Get paths
 script_path = dirname(realpath(sys.argv[0]))
