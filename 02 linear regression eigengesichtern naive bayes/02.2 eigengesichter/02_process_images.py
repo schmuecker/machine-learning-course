@@ -69,6 +69,44 @@ for file in people_folders:
 log('Found', len(people_over_70_files),
     'people with ≥70 pictures.')
 
+
+# ---
+# Images from people with over 70 images
+# ---
+
+# Get images from files
+images = []
+images_paths = []
+images_filenames = []
+for person_path in people_over_70_files:
+    files = sorted(listdir(person_path))
+    for file in files:
+        path = join(person_path, file)
+        image = imread(path, as_gray=True)
+        images.append(image)
+        images_filenames.append(file)
+        images_paths.append(person_path)
+
+log('Got all images of each person, we have a total of',
+    len(images), 'images.')
+
+# Process images
+images_processed = []
+for image in images:
+    i = process_image(image)
+    images_processed.append(i)
+
+# Export processed images to disk
+output_folder = join(script_path, 'data-processed/all/')
+
+# Delete output folder
+if exists(output_folder):
+    shutil.rmtree(output_folder)
+
+# Export images
+export_images(output_folder, images_processed, images_paths, images_filenames)
+
+
 # ---
 # Images from people with over 70 images (except for the last image)
 # ---
@@ -140,7 +178,5 @@ if exists(output_folder):
 
 # Export images
 export_images(output_folder, images_processed, images_paths, images_filenames)
-
-log(images_processed[0])
 
 log('Done.')

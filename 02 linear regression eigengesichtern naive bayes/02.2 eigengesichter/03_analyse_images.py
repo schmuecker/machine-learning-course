@@ -40,7 +40,6 @@ def load_images(path: str):
 # Load pixels from images
 images_t, images_pixels_t = load_images('data-processed/training/')
 images_te, images_pixels_te = load_images('data-processed/test/')
-print(len(images_pixels_t[0]))
 
 # Design matrix
 design_matrix_t = pd.DataFrame(images_pixels_t)
