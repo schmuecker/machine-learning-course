@@ -104,17 +104,6 @@ def check_bush(pred, true):
     print('False positives:', test_false_positives, 'of', test_negatives,
           'negatives. Rate:', round(100*(test_false_positives / test_negatives), 2), '%')
 
-    print('\n ... of total')
-
-    print('True positives:', test_true_positives, 'of', test_positives,
-          'positives. Rate:', round(100*(test_true_positives / len(pred)), 2), '%')
-    print('False negatives:', test_false_negatives, 'of', test_positives,
-          'positives. Rate:', round(100*(test_false_negatives / len(pred)), 2), '%')
-    print('True negatives:', test_true_negatives, 'of', test_negatives,
-          'negatives. Rate:', round(100*(test_true_negatives / len(pred)), 2), '%')
-    print('False positives:', test_false_positives, 'of', test_negatives,
-          'negatives. Rate:', round(100*(test_false_positives / len(pred)), 2), '%')
-
 
 gnb = GaussianNB()
 
