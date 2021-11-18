@@ -47,7 +47,7 @@ X = design_matrix.loc[:, 0:]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.4, random_state=0)
 
-# # PCA
+# PCA
 pca = decomposition.PCA(n_components=7, whiten=True)
 pca.fit(X_train)
 
@@ -96,13 +96,24 @@ def check_bush(pred, true):
             test_false_negatives += 1
 
     print('True positives:', test_true_positives, 'of', test_positives,
-          'positives. Rate:', test_true_positives / test_positives)
+          'positives. Rate:', round(100*(test_true_positives / test_positives), 2), '%')
     print('False negatives:', test_false_negatives, 'of', test_positives,
-          'positives. Rate:', test_false_negatives / test_positives)
+          'positives. Rate:', round(100*(test_false_negatives / test_positives), 2), '%')
     print('True negatives:', test_true_negatives, 'of', test_negatives,
-          'negatives. Rate:', test_true_negatives / test_negatives)
+          'negatives. Rate:', round(100*(test_true_negatives / test_negatives), 2), '%')
     print('False positives:', test_false_positives, 'of', test_negatives,
-          'negatives. Rate:', test_false_positives / test_negatives)
+          'negatives. Rate:', round(100*(test_false_positives / test_negatives), 2), '%')
+
+    print('\n ... of total')
+
+    print('True positives:', test_true_positives, 'of', test_positives,
+          'positives. Rate:', round(100*(test_true_positives / len(pred)), 2), '%')
+    print('False negatives:', test_false_negatives, 'of', test_positives,
+          'positives. Rate:', round(100*(test_false_negatives / len(pred)), 2), '%')
+    print('True negatives:', test_true_negatives, 'of', test_negatives,
+          'negatives. Rate:', round(100*(test_true_negatives / len(pred)), 2), '%')
+    print('False positives:', test_false_positives, 'of', test_negatives,
+          'negatives. Rate:', round(100*(test_false_positives / len(pred)), 2), '%')
 
 
 gnb = GaussianNB()
